@@ -1,0 +1,54 @@
+<main class="flex-1 p-6 bg-gray-50">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Détails du Produit : <?= htmlspecialchars($productDetails['NOM_PRODUIT']) ?></h1>
+        <?php if ($canModifyProducts): ?>
+            <a href="<?= $this->url->get('products/edit/' . $productDetails['ID_PRODUIT']) ?>" class="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 flex items-center space-x-2">
+                <i class="ri-pencil-line"></i>
+                <span>Modifier le produit</span>
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <?= $this->flash->output() ?>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm font-medium text-gray-700">Nom du Produit:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($productDetails['NOM_PRODUIT']) ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Catégorie:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($productDetails['NOM_CATEGORIE']) ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Prix de Vente Moyen:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($productDetails['PRIX_VENTE']) ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Quantité en Stock:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($productDetails['QUANTITE_STOCK']) ?> unités</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Statut du Stock:</p>
+                <?php
+                $statutClass = 'bg-green-100 text-green-800';
+                if ($productDetails['STATUT_PRODUIT'] === 'Faible Stock') {
+                    $statutClass = 'bg-yellow-100 text-yellow-800';
+                } elseif ($productDetails['STATUT_PRODUIT'] === 'Rupture de Stock') {
+                    $statutClass = 'bg-red-100 text-red-800';
+                }
+                ?>
+                <span class="mt-1 px-3 py-1 inline-flex text-base leading-5 font-semibold rounded-full <?= $statutClass ?>">
+                    <?= htmlspecialchars($productDetails['STATUT_PRODUIT']) ?>
+                </span>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <a href="<?= $this->url->get('products') ?>" class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</main>

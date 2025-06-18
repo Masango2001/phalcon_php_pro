@@ -1,31 +1,21 @@
-use Phalcon\Mvc\Model;
-
 <?php
 
+namespace GestionStockVente\Models;
+
+use Phalcon\Mvc\Model;
 
 class Stock extends Model
 {
-    public $id_stock;
-    public $id_produit;
-    public $quantite_stock;
-    public $date_Misejour;
+    public $ID_STOCK;
+    public $ID_PRODUIT;
+    public $QUANTITE_STOCK;
+    public $DATE_MISEJOUR;
 
     public function initialize()
     {
-        $this->setSource('stocks');
+        $this->setSchema("stocketvente");
+        $this->setSource("STOCKS");
 
-        $this->belongsTo(
-            'id_produit',
-            Produit::class,
-            'id_produit',
-            [
-                'alias' => 'produit'
-            ]
-        );
-    }
-
-    public function getSource()
-    {
-        return 'stocks';
+        $this->belongsTo('ID_PRODUIT', 'GestionStockVente\Models\Produit', 'ID_PRODUIT', ['alias' => 'Produit']);
     }
 }

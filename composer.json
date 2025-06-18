@@ -1,0 +1,20 @@
+    {
+        "name": "niyondikojoffre/gestion_stock_vente",
+        "autoload": {
+            "psr-4": {
+                "Niyondikojoffre\\GestionStockVente\\": "src/",
+                "App\\": "app/"
+            }
+        },
+        "authors": [
+            {
+                "name": "Niyondiko Joffre",
+                "email": "niyondikojoffreasjubu@gmail.com"
+            }
+        ],
+        "require-dev": {
+            "phalcon/devtools": "^5.0"
+        },
+        "minimum-stability": "dev",
+        "prefer-stable": true
+    }

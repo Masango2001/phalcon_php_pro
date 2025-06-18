@@ -1,0 +1,443 @@
+<main class="p-6 bg-gray-50 min-h-screen">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="card bg-white p-6 rounded-lg shadow-md flex items-center">
+            <div class="w-12 h-12 flex items-center justify-center bg-blue-100 text-primary rounded-full mr-4">
+                <i class="ri-line-chart-line ri-xl"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Total Ventes</p>
+                <p class="text-2xl font-semibold text-gray-800"><?php echo htmlspecialchars($total_sales); ?></p>
+            </div>
+        </div>
+
+        <div class="card bg-white p-6 rounded-lg shadow-md flex items-center">
+            <div class="w-12 h-12 flex items-center justify-center bg-green-100 text-secondary rounded-full mr-4">
+                <i class="ri-archive-line ri-xl"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Produits en Stock</p>
+                <p class="text-2xl font-semibold text-gray-800"><?php echo htmlspecialchars($stock_total); ?></p>
+            </div>
+        </div>
+
+        <div class="card bg-white p-6 rounded-lg shadow-md flex items-center">
+            <div class="w-12 h-12 flex items-center justify-center bg-purple-100 text-purple-600 rounded-full mr-4">
+                <i class="ri-user-add-line ri-xl"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Total Clients</p>
+                <p class="text-2xl font-semibold text-gray-800"><?php echo htmlspecialchars($total_clients); ?></p>
+            </div>
+        </div>
+
+        <?php if (!empty($user_stats)): ?>
+            <?php if (isset($user_stats['users'])): ?>
+                <div class="card bg-white p-6 rounded-lg shadow-md flex items-center">
+                    <div class="w-12 h-12 flex items-center justify-center bg-orange-100 text-orange-600 rounded-full mr-4">
+                        <i class="ri-group-line ri-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Utilisateurs</p>
+                        <p class="text-2xl font-semibold text-gray-800"><?php echo htmlspecialchars(count($user_stats['users'])); ?></p>
+                    </div>
+                </div>
+            <?php elseif (isset($user_stats['my_recent_sales'])): ?>
+                <div class="card bg-white p-6 rounded-lg shadow-md flex items-center">
+                    <div class="w-12 h-12 flex items-center justify-center bg-pink-100 text-pink-600 rounded-full mr-4">
+                        <i class="ri-shopping-cart-line ri-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Vos Ventes Récentes</p>
+                        <p class="text-2xl font-semibold text-gray-800"><?php echo htmlspecialchars(count($user_stats['my_recent_sales'])); ?></p>
+                    </div>
+                </div>
+            <?php elseif (isset($user_stats['recent_stock_updates'])): ?>
+                <div class="card bg-white p-6 rounded-lg shadow-md flex items-center">
+                    <div class="w-12 h-12 flex items-center justify-center bg-teal-100 text-teal-600 rounded-full mr-4">
+                        <i class="ri-refresh-line ri-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Dernières Mises à Jour Stock</p>
+                        <p class="text-2xl font-semibold text-gray-800"><?php echo htmlspecialchars(count($user_stats['recent_stock_updates'])); ?></p>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Ventes Annuelles</h2>
+                <div class="relative inline-block text-left">
+                    <button id="chart-period-btn" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                        Cette année <i class="ri-arrow-down-s-line ml-2 -mr-1"></i>
+                    </button>
+                    <div id="chart-period-dropdown" class="dashboard-dropdown-content absolute right-0 mt-2 w-48 origin-top-right">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cette année</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mois dernier</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Derniers 7 jours</a>
+                    </div>
+                </div>
+            </div>
+            <div id="annualSalesChart" style="width: 100%; height: 300px;">
+                <canvas id="annualSalesCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Top 5 Produits</h2>
+            <div id="topProductsChart" style="width: 100%; height: 300px;">
+                <canvas id="topProductsCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Transactions Récentes (Toutes Ventes)</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Commande</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit (premier)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <?php if (!empty($recent_sales)): ?>
+                        <?php foreach ($recent_sales as $sale): ?>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#C<?php echo htmlspecialchars(str_pad($sale['ID_VENTE'], 3, '0', STR_PAD_LEFT)); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['client']); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['product']); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['qty']); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['amount']); ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['date'] . ' ' . $sale['time']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Aucune transaction récente trouvée.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Statistiques Utilisateur</h2>
+            <?php if (!empty($user_stats)): ?>
+                <?php if (isset($user_stats['users'])): ?>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom d'utilisateur</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php foreach ($user_stats['users'] as $user): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($user['USERNAME']); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars(ucfirst($user['ROLE'])); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($user['EMAIL']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php elseif (isset($user_stats['my_recent_sales'])): ?>
+                    <h3 class="text-md font-semibold text-gray-700 mb-3">Vos 5 Ventes Récentes</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Vente</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant Total</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Détails</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php if (!empty($user_stats['my_recent_sales'])): ?>
+                                    <?php foreach ($user_stats['my_recent_sales'] as $sale): ?>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#V<?php echo htmlspecialchars(str_pad($sale['ID_VENTE'], 3, '0', STR_PAD_LEFT)); ?></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['client_name']); ?></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['total_amount']); ?></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($sale['date']); ?></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:underline cursor-pointer" onclick="toggleSaleDetails('sale-details-<?php echo $sale['ID_VENTE']; ?>')">
+                                                Voir Détails
+                                            </td>
+                                        </tr>
+                                        <tr id="sale-details-<?php echo $sale['ID_VENTE']; ?>" class="hidden bg-gray-50">
+                                            <td colspan="5" class="px-6 py-4">
+                                                <h4 class="font-semibold text-gray-700 mb-2">Produits de la vente:</h4>
+                                                <ul class="list-disc list-inside text-sm text-gray-600">
+                                                    <?php foreach ($sale['products'] as $product): ?>
+                                                        <li><?php echo htmlspecialchars($product['name']); ?> (Qty: <?php echo htmlspecialchars($product['qty']); ?>, Prix Unitaire: <?php echo htmlspecialchars(number_format($product['price'], 2)); ?> €, Sous-total: <?php echo htmlspecialchars(number_format($product['subtotal'], 2)); ?> €)</li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Aucune vente récente trouvée pour vous.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php elseif (isset($user_stats['recent_stock_updates'])): ?>
+                    <h3 class="text-md font-semibold text-gray-700 mb-3">5 Dernières Mises à Jour de Stock</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité en Stock</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de Mise à Jour</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php if (!empty($user_stats['recent_stock_updates'])): ?>
+                                    <?php foreach ($user_stats['recent_stock_updates'] as $update): ?>
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($update['product_name']); ?></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($update['QUANTITE_STOCK']); ?></td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($update['date_formatted']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Aucune mise à jour de stock récente trouvée.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            <?php else: ?>
+                <p class="text-sm text-gray-500">Aucune statistique utilisateur spécifique disponible pour ce rôle.</p>
+            <?php endif; ?>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Alertes de Stock</h2>
+            <ul class="space-y-4">
+                <?php if (!empty($stock_alerts)): ?>
+                    <?php foreach ($stock_alerts as $alert): ?>
+                        <li class="flex justify-between items-center <?php echo htmlspecialchars($alert['bg_class']); ?> p-3 rounded-lg border border-<?php echo htmlspecialchars(str_replace('text-', '', $alert['level_class'])); ?>-200">
+                            <div>
+                                <p class="text-sm font-medium <?php echo htmlspecialchars($alert['level_class']); ?>"><?php echo htmlspecialchars($alert['name']); ?></p>
+                                <p class="text-xs <?php echo htmlspecialchars(str_replace('text-', '', $alert['level_class'])); ?>-500">Stock restant: <?php echo htmlspecialchars($alert['QUANTITE_STOCK']); ?></p>
+                            </div>
+                            <span class="text-sm font-semibold <?php echo htmlspecialchars($alert['text_class']); ?>"><?php echo htmlspecialchars(ucfirst($alert['level'])); ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li class="text-gray-500 text-sm">Aucune alerte de stock en ce moment.</li>
+                <?php endif; ?>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Data passed from PHP
+        const annualSalesData = <?php echo json_encode($annual_sales_data); ?>;
+        const topProductsData = <?php echo json_encode($top_products_data); ?>;
+
+        // Annual Sales Chart (Line Chart)
+        if (annualSalesData.length > 0 && annualSalesData.some(item => item.sales > 0)) {
+            const annualSalesLabels = annualSalesData.map(item => item.month);
+            const annualSalesValues = annualSalesData.map(item => item.sales);
+
+            const annualSalesCtx = document.getElementById('annualSalesCanvas').getContext('2d');
+            new Chart(annualSalesCtx, {
+                type: 'line',
+                data: {
+                    labels: annualSalesLabels,
+                    datasets: [{
+                        label: 'Ventes Mensuelles (€)',
+                        data: annualSalesValues,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Montant des Ventes (€)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mois'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString('fr-FR', {
+                                        style: 'currency',
+                                        currency: 'EUR'
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('annualSalesChart').innerHTML = '<p class="text-center text-gray-500 mt-16">Aucune donnée de vente annuelle disponible pour l\'instant.</p>';
+        }
+
+        // Top 5 Products Chart (Bar Chart)
+        if (topProductsData.length > 0 && topProductsData.some(item => item.total_sold_amount > 0)) {
+            const topProductsLabels = topProductsData.map(item => item.product_name);
+            const topProductsValues = topProductsData.map(item => item.total_sold_amount);
+
+            const topProductsCtx = document.getElementById('topProductsCanvas').getContext('2d');
+            new Chart(topProductsCtx, {
+                type: 'bar',
+                data: {
+                    labels: topProductsLabels,
+                    datasets: [{
+                        label: 'Montant des Ventes (€)',
+                        data: topProductsValues,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Montant des Ventes (€)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Produit'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed.x.toLocaleString('fr-FR', {
+                                        style: 'currency',
+                                        currency: 'EUR'
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('topProductsChart').innerHTML = '<p class="text-center text-gray-500 mt-16">Aucune donnée de top produits disponible pour l\'instant.</p>';
+        }
+
+        // Dropdown functionality (unchanged)
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartPeriodBtn = document.getElementById('chart-period-btn');
+            const chartPeriodDropdown = document.getElementById('chart-period-dropdown');
+
+            if (chartPeriodBtn && chartPeriodDropdown) {
+                chartPeriodBtn.addEventListener('click', function(event) {
+                    event.stopPropagation(); // Prevent document click from closing it immediately
+                    chartPeriodDropdown.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!chartPeriodBtn.contains(event.target) && !chartPeriodDropdown.contains(event.target)) {
+                        chartPeriodDropdown.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        // Toggle sale details for seller's recent sales
+        function toggleSaleDetails(id) {
+            const row = document.getElementById(id);
+            if (row) {
+                row.classList.toggle('hidden');
+            }
+        }
+    </script>
+</main>
+
+<style>
+    .dashboard-dropdown-content {
+        display: none;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 0.375rem;
+        /* rounded-md */
+    }
+
+    .dashboard-dropdown-content.active {
+        display: block;
+    }
+
+    .dashboard-dropdown-content a {
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dashboard-dropdown-content a:hover {
+        background-color: #ddd;
+    }
+</style>

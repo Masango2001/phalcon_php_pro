@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
+use Phalcon\Di\FactoryDefault;
 use Phalcon\Html\Escaper;
-use Phalcon\Flash\Direct as Flash;
+use Phalcon\Flash\Session as FlashSession;
 use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\View\Engine\Php as PhpEngine;
@@ -10,63 +12,59 @@ use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use Phalcon\Session\Adapter\Stream as SessionAdapter;
 use Phalcon\Session\Manager as SessionManager;
 use Phalcon\Mvc\Url as UrlResolver;
+use Phalcon\Db\Adapter\Pdo\Mysql as DbAdapter;
+use Phalcon\Tag;
 
 /**
  * Shared configuration service
  */
 $di->setShared('config', function () {
-    return include APP_PATH . "/config/config.php";
+    return include APP_PATH . '/config/config.php';
 });
 
 /**
- * The URL component is used to generate all kind of urls in the application
+ * URL Resolver
  */
 $di->setShared('url', function () {
     $config = $this->getConfig();
-
     $url = new UrlResolver();
     $url->setBaseUri($config->application->baseUri);
-
     return $url;
 });
 
 /**
- * Setting up the view component
+ * View component with Volt and PhpEngine
  */
 $di->setShared('view', function () {
     $config = $this->getConfig();
-
     $view = new View();
     $view->setDI($this);
     $view->setViewsDir($config->application->viewsDir);
+    $view->setLayoutsDir('layouts/');
+    $view->setLayout('main');
 
     $view->registerEngines([
         '.volt' => function ($view) {
             $config = $this->getConfig();
-
             $volt = new VoltEngine($view, $this);
-
             $volt->setOptions([
-                'path' => $config->application->cacheDir,
-                'separator' => '_'
+                'path'      => $config->application->cacheDir,
+                'extension' => '.php',
+                'prefix'    => '__volt__',
             ]);
-
             return $volt;
         },
         '.phtml' => PhpEngine::class
-
     ]);
 
     return $view;
 });
 
 /**
- * Database connection is created based in the parameters defined in the configuration file
+ * Database connection
  */
 $di->setShared('db', function () {
     $config = $this->getConfig();
-
-    $class = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
     $params = [
         'host'     => $config->database->host,
         'username' => $config->database->username,
@@ -75,48 +73,47 @@ $di->setShared('db', function () {
         'charset'  => $config->database->charset
     ];
 
-    if ($config->database->adapter == 'Postgresql') {
-        unset($params['charset']);
+    if (isset($config->database->port)) {
+        $params['port'] = $config->database->port;
     }
 
-    return new $class($params);
+    return new DbAdapter($params);
 });
 
-
 /**
- * If the configuration specify the use of metadata adapter use it or use memory otherwise
+ * Metadata (for models)
  */
 $di->setShared('modelsMetadata', function () {
     return new MetaDataAdapter();
 });
 
 /**
- * Register the session flash service with the Twitter Bootstrap classes
+ * Flash messages using session (recommended)
  */
-$di->set('flash', function () {
+$di->setShared('flash', function () {
     $escaper = new Escaper();
-    $flash = new Flash($escaper);
-    $flash->setImplicitFlush(false);
-    $flash->setCssClasses([
-        'error'   => 'alert alert-danger',
-        'success' => 'alert alert-success',
-        'notice'  => 'alert alert-info',
-        'warning' => 'alert alert-warning'
-    ]);
-
+    $flash = new FlashSession($escaper);
+    $flash->setImplicitFlush(false); // important pour éviter l'affichage immédiat
+    $flash->setAutomaticHtml(false); // désactive le HTML automatique de Phalcon
     return $flash;
 });
 
 /**
- * Start the session the first time some component request the session service
+ * Session management
  */
 $di->setShared('session', function () {
-    $session = new SessionManager();
+    $manager = new SessionManager();
     $files = new SessionAdapter([
         'savePath' => sys_get_temp_dir(),
     ]);
-    $session->setAdapter($files);
-    $session->start();
+    $manager->setAdapter($files);
+    $manager->start();
+    return $manager;
+});
 
-    return $session;
+/**
+ * Tag helper
+ */
+$di->setShared('tag', function () {
+    return new Tag();
 });

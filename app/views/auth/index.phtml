@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        @keyframes gradient-x {
+
+            0%,
+            100% {
+                transform: translateX(0%);
+            }
+
+            50% {
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-25%);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        @keyframes wave-slow {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-25%);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        @keyframes wave-fast {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-25%);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, #4B0082, #8A2BE2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        .animate-gradient-x {
+            animation: gradient-x 15s ease infinite;
+        }
+
+        .animate-wave {
+            animation: wave 10s ease-in-out infinite;
+        }
+
+        .animate-wave-slow {
+            animation: wave-slow 15s ease-in-out infinite;
+        }
+
+        .animate-wave-fast {
+            animation: wave-fast 8s ease-in-out infinite;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+        }
+
+        .animation-delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .animation-delay-400 {
+            animation-delay: 0.4s;
+        }
+
+        .animation-delay-600 {
+            animation-delay: 0.6s;
+        }
+
+        .animation-delay-800 {
+            animation-delay: 0.8s;
+        }
+
+        .animation-delay-1000 {
+            animation-delay: 1s;
+        }
+
+        .animation-delay-1200 {
+            animation-delay: 1.2s;
+        }
+
+        .custom-input:focus-within .icon {
+            color: #AB47BC;
+            transform: scale(1.1);
+        }
+
+        .custom-input:focus-within input {
+            border-color: #AB47BC;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 2px rgba(171, 71, 188, 0.5);
+        }
+
+        .custom-input:focus-within .gradient-overlay {
+            background: linear-gradient(to right, rgba(244, 114, 182, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .custom-input input {
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        label {
+            color: #d1c4e9;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to top, #1A1A2E, transparent);
+        }
+
+        .wave-shape {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23202030" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,85.3C672,96,768,160,864,176C960,192,1056,160,1152,138.7C1248,117,1344,107,1392,101.3L1440,96V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0V64Z" /%3E%3C/svg%3E');
+            background-size: cover;
+            animation: wave 7s infinite ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen relative overflow-hidden">
+    <div class="absolute inset-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-purple-500/20 to-pink-600/20 animate-gradient-x"></div>
+        <div class="absolute bottom-0 left-0 w-full h-full">
+            <svg class="absolute bottom-0 w-full h-64 text-purple-500/10" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="animate-wave"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" class="animate-wave-slow"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" class="animate-wave-fast"></path>
+            </svg>
+        </div>
+        <?php for ($i = 0; $i < 20; $i++): ?>
+            <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-float" style="left: <?php echo rand(0, 100); ?>%; top: <?php echo rand(0, 100); ?>%; animation-delay: <?php echo rand(0, 4); ?>s; animation-duration: <?php echo 3 + (rand(0, 2) / 1); ?>s;"></div>
+        <?php endfor; ?>
+    </div>
+
+
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-lg overflow-hidden">
+            <?php if ($this->flashSession->getMessages()) {
+                echo '<div class="flash-messages">';
+                $this->flashSession->output();
+                echo '</div>';
+            }
+            ?>
+            <div class="text-center pb-8 pt-8 relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 animate-pulse"></div>
+                <div class="relative z-10">
+                    <div class="mx-auto w-20 h-20 mb-6 relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-spin-slow opacity-75"></div>
+                        <div class="absolute inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <i class="ri-heart-fill text-white animate-pulse" style="font-size: 32px;"></i>
+                        </div>
+                    </div>
+                    <h1 class="text-4xl font-bold text-white mb-2 animate-fade-in-up animation-delay-200">Bienvenue</h1>
+                    <p class="text-white/70 text-lg animate-fade-in-up animation-delay-400">Connectez-vous à votre univers</p>
+                </div>
+            </div>
+            <div class="space-y-6 px-8 pb-8">
+                <form method="POST" action="/login" class="space-y-6">
+                    <div class="space-y-2 animate-fade-in-up animation-delay-600">
+                        <label for="username" class="block text-white/90 font-medium">Nom d'utilisateur</label>
+                        <div class="relative custom-input">
+                            <i class="ri-user-line absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-5 h-5 transition-all duration-300 icon"></i>
+                            <input type="text" id="username" name="username" placeholder="Entrez votre nom d'utilisateur" class="w-full pl-12 pr-4 py-3 bg-white/05 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all duration-300 rounded-xl" required>
+                            <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500/0 via-purple-500/0 to-blue-500/0 gradient-overlay transition-all duration-500 pointer-events-none"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 animate-fade-in-up animation-delay-800">
+                        <label for="password" class="block text-white/90 font-medium">Mot de passe</label>
+                        <div class="relative custom-input">
+                            <i class="ri-lock-line absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-5 h-5 transition-all duration-300 icon"></i>
+                            <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" class="w-full pl-12 pr-12 py-3 bg-white/05 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all duration-300 rounded-xl" required>
+                            <button type="button" id="toggle-password" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-all duration-300 hover:scale-110">
+                                <i class="ri-eye-line w-5 h-5" id="password-icon"></i>
+                            </button>
+                            <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/0 via-pink-500/0 to-blue-500/0 gradient-overlay transition-all duration-500 pointer-events-none"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between animate-fade-in-up animation-delay-1000">
+                        <label class="flex items-center space-x-2 cursor-pointer group">
+                            <input type="checkbox" class="sr-only" id="remember" name="remember">
+                            <div class="w-5 h-5 border-2 border-white/30 rounded bg-white/10 group-hover:border-pink-400 transition-all duration-300 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-pink-400 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                            <span class="text-white/70 text-sm group-hover:text-white transition-colors duration-300">Se souvenir de moi</span>
+                        </label>
+                        <a href="#" class="text-pink-400 hover:text-pink-300 text-sm font-medium transition-all duration-300 hover:scale-105">Mot de passe oublié ?</a>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed animate-fade-in-up animation-delay-1200 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                        <span class="relative flex items-center justify-center space-x-2">
+                            <i class="ri-sparkling-fill w-5 h-5"></i>
+                            <span>Se connecter</span>
+                        </span>
+                    </button>
+                </form>
+                <div class="text-center animate-fade-in-up animation-delay-1400">
+                    <p class="text-white/70">Pas encore de compte ? <a href="#" class="text-pink-400 hover:text-pink-300 font-medium transition-all duration-300 hover:scale-105">Créer un compte</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('password-icon');
+
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                passwordIcon.className = type === 'password' ? 'ri-eye-line w-5 h-5' : 'ri-eye-off-line w-5 h-5';
+            });
+
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const button = form.querySelector('button');
+                button.disabled = true;
+                setTimeout(() => {
+                    button.disabled = false;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,26 +1,22 @@
-use Phalcon\Mvc\Model;
-
 <?php
 
+namespace GestionStockVente\Models;
+
+use Phalcon\Mvc\Model;
 
 class Client extends Model
 {
-    public $id_client;
-    public $nom_client;
-    public $prenom_client;
-    public $adresse_client;
-    public $telephone_client;
+    public $ID_CLIENT;
+    public $NOM_CLIENT;
+    public $PRENOM_CLIENT;
+    public $ADRESSE_CLIENT;
+    public $TELEPHONE_CLIENT;
 
     public function initialize()
     {
-        $this->setSource('clients');
-        $this->hasMany(
-            'id_client',
-            Vente::class,
-            'id_client',
-            [
-                'alias' => 'ventes'
-            ]
-        );
+        $this->setSchema("stocketvente");
+        $this->setSource("CLIENTS");
+
+        $this->hasMany('ID_CLIENT', 'GestionStockVente\Models\Vente', 'ID_CLIENT', ['alias' => 'Ventes']);
     }
 }

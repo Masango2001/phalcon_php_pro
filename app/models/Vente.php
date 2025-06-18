@@ -1,40 +1,23 @@
-use Phalcon\Mvc\Model;
-
 <?php
+
+namespace GestionStockVente\Models;
+
+use Phalcon\Mvc\Model;
 
 class Vente extends Model
 {
-    public $id_vente;
-    public $id_client;
-    public $id_utilisateur;
-    public $date_vente;
-    public $id_produit;
+    public $ID_VENTE;
+    public $ID_UTILISATEUR;
+    public $ID_CLIENT;
+    public $DATE_VENTE;
 
     public function initialize()
     {
-        $this->setSource('ventes');
+        $this->setSchema("stocketvente");
+        $this->setSource("VENTES");
 
-        $this->belongsTo(
-            'id_produit',
-            Produit::class,
-            'id_produit'
-        );
-
-        $this->belongsTo(
-            'id_client',
-            Client::class,
-            'id_client'
-        );
-
-        $this->belongsTo(
-            'id_utilisateur',
-            Utilisateur::class,
-            'id_utilisateur'
-        );
-    }
-
-    public function getSource()
-    {
-        return 'ventes';
+        $this->hasMany('ID_VENTE', 'GestionStockVente\Models\Concerner', 'ID_VENTE', ['alias' => 'Concerner']);
+        $this->belongsTo('ID_CLIENT', 'GestionStockVente\Models\Client', 'ID_CLIENT', ['alias' => 'Client']);
+        $this->belongsTo('ID_UTILISATEUR', 'GestionStockVente\Models\Utilisateur', 'ID_UTILISATEUR', ['alias' => 'Utilisateur']);
     }
 }

@@ -1,23 +1,19 @@
-use Phalcon\Mvc\Model;
-
 <?php
 
+namespace GestionStockVente\Models;
+
+use Phalcon\Mvc\Model;
 
 class Categorie extends Model
 {
-    public $id_categorie;
-    public $nom_categorie;
+    public $ID_CATEGORIE;
+    public $NOM_CATEGORIE;
 
     public function initialize()
     {
-        $this->setSource('categories');
-        $this->hasMany(
-            'id_categorie',
-            Produit::class,
-            'id_categorie',
-            [
-                'alias' => 'Produits'
-            ]
-        );
+        $this->setSchema("stocketvente");
+        $this->setSource("CATEGORIES");
+
+        $this->hasMany('ID_CATEGORIE', 'GestionStockVente\Models\Produit', 'ID_CATEGORIE', ['alias' => 'Produits']);
     }
 }

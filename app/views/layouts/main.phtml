@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion - <?= isset($title) ? htmlspecialchars($title) : 'Chargement...' ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 5rem;
+        }
+
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Renamed to .active-sidebar-item to avoid conflict if any */
+        .active-sidebar-item {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .custom-checkbox:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .custom-radio {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .custom-radio:checked {
+            border-color: #3b82f6;
+        }
+
+        .custom-radio:checked::after {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #d1d5db;
+            outline: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .range-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f5f9;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <?php echo $this->partial('partials/sidebar'); ?>
+
+        <div id="main-content" class="main-content flex-1 overflow-y-auto">
+            <?php echo $this->partial('partials/top_navigation', ['title' => $this->view->getVar('title')]); ?>
+            <div id="dynamic-content-container">
+                <?php echo $this->getContent(); ?>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const toggleBtn = document.getElementById('toggle-sidebar');
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const dynamicContentContainer = document.getElementById('dynamic-content-container');
+
+            async function loadContent(url) {
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.querySelector('#dynamic-content-container') ?
+                        doc.querySelector('#dynamic-content-container').innerHTML :
+                        doc.body.innerHTML;
+                    dynamicContentContainer.innerHTML = newContent;
+                    const newTitle = doc.querySelector('title') ? doc.querySelector('title').innerText : null;
+                    if (newTitle) document.title = newTitle;
+
+                    // Réinitialiser les dropdowns et les modals
+                    initializeDropdowns();
+                    initializeModals();
+                } catch (error) {
+                    console.error('Error loading content:', error);
+                    dynamicContentContainer.innerHTML = '<p>Erreur de chargement. Veuillez réessayer.</p>';
+                }
+            }
+
+            function setActiveSidebarItem(url) {
+                sidebarLinks.forEach(link => link.classList.remove('active-sidebar-item'));
+                const activeLink = document.querySelector(`.sidebar-link[data-url="${url}"]`);
+                if (activeLink) activeLink.classList.add('active-sidebar-item');
+            }
+
+            function initializeDropdowns() {
+                function toggleDropdown(buttonId, dropdownId) {
+                    const button = document.getElementById(buttonId);
+                    const dropdown = document.getElementById(dropdownId);
+                    if (button && dropdown) {
+                        const newButton = button.cloneNode(true);
+                        button.parentNode.replaceChild(newButton, button);
+
+                        newButton.addEventListener('click', function(event) {
+                            event.stopPropagation();
+                            dropdown.classList.toggle('show');
+                        });
+                        window.addEventListener('click', function(event) {
+                            if (!event.target.matches(`#${buttonId}`) && !event.target.closest(`#${buttonId}`) && !event.target.closest(`#${dropdownId}`)) {
+                                if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+                            }
+                        });
+                    } else {
+                        console.warn(`Éléments non trouvés : buttonId=${buttonId}, dropdownId=${dropdownId}`);
+                    }
+                }
+
+                toggleDropdown('notification-btn', 'notification-dropdown');
+                toggleDropdown('user-menu-btn', 'user-dropdown');
+                toggleDropdown('chart-period-btn', 'chart-period-dropdown');
+            }
+
+            function initializeModals() {
+                // --- Modal pour ajouter un client ---
+                const addClientBtn = document.getElementById('add-client-btn');
+                const addClientModal = document.getElementById('add-client-modal');
+                const closeAddClientModal = document.getElementById('close-add-client-modal');
+                const cancelAddClient = document.getElementById('cancel-add-client');
+                const addClientForm = document.getElementById('add-client-form');
+
+                if (addClientBtn) {
+                    addClientBtn.addEventListener('click', () => {
+                        addClientModal.classList.remove('hidden');
+                    });
+                }
+
+                if (closeAddClientModal) {
+                    closeAddClientModal.addEventListener('click', () => {
+                        addClientModal.classList.add('hidden');
+                    });
+                }
+                if (cancelAddClient) {
+                    cancelAddClient.addEventListener('click', () => {
+                        addClientModal.classList.add('hidden');
+                    });
+                }
+
+                if (addClientForm) {
+                    addClientForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(addClientForm);
+                        const data = Object.fromEntries(formData);
+
+                        console.log('Envoi données client:', data);
+
+                        try {
+                            const response = await fetch('/clients/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify(data)
+                            });
+
+                            const result = await response.json();
+                            console.log('Réponse serveur:', result);
+
+                            if (result.status === 'success') {
+                                alert(result.message);
+                                addClientModal.classList.add('hidden');
+                                addClientForm.reset();
+                                window.location.reload();
+                            } else {
+                                alert(result.message);
+                            }
+                        } catch (error) {
+                            console.error('Erreur AJAX:', error);
+                            alert('Erreur lors de l\'envoi des données.');
+                        }
+                    });
+                }
+
+                // Gestion du dropdown pour le filtre de statut (clients)
+                const statusFilterBtn = document.getElementById('status-filter-btn');
+                const statusFilterDropdown = document.getElementById('status-filter-dropdown');
+
+                if (statusFilterBtn && statusFilterDropdown) {
+                    statusFilterBtn.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        statusFilterDropdown.classList.toggle('active');
+                    });
+
+                    document.addEventListener('click', function(e) {
+                        if (!statusFilterBtn.contains(e.target) && !statusFilterDropdown.contains(e.target)) {
+                            statusFilterDropdown.classList.remove('active');
+                        }
+                    });
+                }
+
+                // --- Modal pour ajouter un fournisseur ---
+                // Gestion du modal d'ajout de fournisseur
+                const addFournisseurBtn = document.getElementById('add-fournisseur-btn');
+                const addFournisseurModal = document.getElementById('add-fournisseur-modal');
+                const closeAddFournisseurModal = document.getElementById('close-add-fournisseur-modal');
+                const cancelAddFournisseur = document.getElementById('cancel-add-fournisseur');
+                const addFournisseurForm = document.getElementById('add-fournisseur-form');
+
+                if (addFournisseurBtn) {
+                    addFournisseurBtn.addEventListener('click', () => {
+                        addFournisseurModal.classList.remove('hidden');
+                    });
+                }
+
+                if (closeAddFournisseurModal) {
+                    closeAddFournisseurModal.addEventListener('click', () => {
+                        addFournisseurModal.classList.add('hidden');
+                    });
+                }
+                if (cancelAddFournisseur) {
+                    cancelAddFournisseur.addEventListener('click', () => {
+                        addFournisseurModal.classList.add('hidden');
+                    });
+                }
+
+                if (addFournisseurForm) {
+                    addFournisseurForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(addFournisseurForm);
+                        const data = Object.fromEntries(formData);
+
+                        console.log('Envoi données fournisseur:', data);
+
+                        try {
+                            const response = await fetch('/suppliers/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify(data)
+                            });
+
+                            console.log('Statut HTTP:', response.status);
+                            const text = await response.text();
+                            console.log('Réponse brute:', text);
+
+                            let result;
+                            try {
+                                result = JSON.parse(text);
+                            } catch (e) {
+                                console.error('Erreur parsing JSON:', e, 'Réponse:', text);
+                                throw new Error('Réponse non-JSON reçue');
+                            }
+
+                            console.log('Réponse serveur:', result);
+
+                            if (result.status === 'success') {
+                                alert(result.message);
+                                addFournisseurModal.classList.add('hidden');
+                                addFournisseurForm.reset();
+                                window.location.reload();
+                            } else {
+                                alert(result.message);
+                            }
+                        } catch (error) {
+                            console.error('Erreur AJAX:', error);
+                            alert('Erreur lors de l\'envoi des données : ' + error.message);
+                        }
+                    });
+                }
+
+                // Gestion des filtres pour fournisseurs
+                const searchInput = document.getElementById('search-input');
+                const sortBy = document.getElementById('sort-by');
+
+                function applyFilters() {
+                    if (searchInput && sortBy) {
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('search', searchInput.value);
+                        currentUrl.searchParams.set('sort_by', sortBy.value);
+                        currentUrl.searchParams.set('page', 1); // Reset to first page
+                        window.location.href = currentUrl.toString();
+                    }
+                }
+
+                if (searchInput) {
+                    searchInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            applyFilters();
+                        }
+                    });
+                }
+
+                if (sortBy) {
+                    sortBy.addEventListener('change', applyFilters);
+                }
+
+                const addUserBtn = document.getElementById('add-user-btn');
+                const userTableBody = document.getElementById('user-table-body');
+                const userModal = document.getElementById('user-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const userIdField = document.getElementById('user-id');
+                const usernameField = document.getElementById('username');
+                const emailField = document.getElementById('email');
+                const passwordField = document.getElementById('password');
+                const passwordGroup = document.getElementById('password-group');
+                const passwordHint = document.getElementById('password-hint');
+                const roleField = document.getElementById('role');
+                const userForm = document.getElementById('user-form');
+                const closeModalBtn = document.getElementById('close-modal-btn');
+
+                async function sendAjaxRequest(url, method, data) {
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: data ? JSON.stringify(data) : null,
+                        });
+
+                        console.log('Statut HTTP:', response.status);
+                        const text = await response.text();
+                        console.log('Réponse brute:', text);
+
+                        let result;
+                        try {
+                            result = JSON.parse(text);
+                        } catch (e) {
+                            console.error('Erreur parsing JSON:', e, 'Réponse:', text);
+                            throw new Error('Réponse non-JSON reçue');
+                        }
+
+                        if (!response.ok) {
+                            throw new Error(result.message || `Erreur HTTP: ${response.status}`);
+                        }
+
+                        return result;
+                    } catch (error) {
+                        console.error('Erreur AJAX:', error);
+                        alert('Une erreur est survenue: ' + error.message);
+                        return {
+                            success: false,
+                            message: error.message
+                        };
+                    }
+                }
+
+                async function loadUsers() {
+                    if (userTableBody) {
+                        userTableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Chargement des utilisateurs...</td></tr>';
+                        const result = await sendAjaxRequest('/users/list', 'GET');
+
+                        if (result.success) {
+                            renderUsersTable(result.data);
+                        } else {
+                            userTableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-red-500">${result.message || 'Erreur lors du chargement des utilisateurs.'}</td></tr>`;
+                        }
+                    }
+                }
+
+                function renderUsersTable(users) {
+                    if (userTableBody) {
+                        userTableBody.innerHTML = '';
+                        if (users && users.length > 0) {
+                            users.forEach(user => {
+                                const row = document.createElement('tr');
+                                row.dataset.userId = user.ID_UTILISATEUR;
+                                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.USERNAME}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.EMAIL}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.ROLE}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-gray-100 edit-user-btn" title="Modifier" data-id="${user.ID_UTILISATEUR}">
+                            <i class="ri-pencil-line"></i>
+                        </button>
+                        <button class="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-100 ml-2 delete-user-btn" title="Supprimer" data-id="${user.ID_UTILISATEUR}">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </td>
+                `;
+                                userTableBody.appendChild(row);
+                            });
+                        } else {
+                            userTableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Aucun utilisateur trouvé.</td></tr>`;
+                        }
+                    }
+                }
+
+                function openUserModal(isEdit = false, userData = {}) {
+                    if (userForm && userIdField && usernameField && emailField && passwordField && passwordHint && roleField && modalTitle) {
+                        console.log('Ouverture modal:', isEdit ? 'Modification' : 'Création', userData);
+                        userForm.reset();
+                        userIdField.value = '';
+
+                        if (isEdit) {
+                            modalTitle.textContent = 'Modifier l\'utilisateur';
+                            userIdField.value = userData.ID_UTILISATEUR;
+                            usernameField.value = userData.USERNAME;
+                            emailField.value = userData.EMAIL;
+                            roleField.value = userData.ROLE;
+                            passwordField.removeAttribute('required');
+                            passwordField.value = '';
+                            passwordHint.classList.remove('hidden');
+                        } else {
+                            modalTitle.textContent = 'Ajouter un utilisateur';
+                            passwordField.setAttribute('required', 'required');
+                            passwordHint.classList.add('hidden');
+                        }
+                        userModal.classList.remove('hidden');
+                    }
+                }
+
+                function closeUserModal() {
+                    if (userModal && userForm) {
+                        console.log('Fermeture modal');
+                        userModal.classList.add('hidden');
+                        userForm.reset();
+                    }
+                }
+
+                if (addUserBtn) {
+                    addUserBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        openUserModal(false);
+                    });
+                }
+
+                if (closeModalBtn) {
+                    closeModalBtn.addEventListener('click', closeUserModal);
+                }
+
+                if (userModal) {
+                    userModal.addEventListener('click', function(event) {
+                        if (event.target === userModal) {
+                            closeUserModal();
+                        }
+                    });
+                }
+
+                if (userForm) {
+                    userForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const userId = userIdField.value;
+                        const url = userId ? '/users/update' : '/users/create';
+                        const data = {
+                            username: usernameField.value,
+                            email: emailField.value,
+                            role: roleField.value
+                        };
+
+                        if (passwordField.value) {
+                            data.password = passwordField.value;
+                        }
+
+                        if (userId) {
+                            data.id_utilisateur = userId;
+                        }
+
+                        console.log('Envoi données:', data, 'URL:', url);
+
+                        const result = await sendAjaxRequest(url, 'POST', data);
+
+                        if (result.success) {
+                            alert(result.message);
+                            closeUserModal();
+                            loadUsers();
+                        } else {
+                            alert(result.message || 'Une erreur est survenue.');
+                        }
+                    });
+                }
+
+                if (userTableBody) {
+                    userTableBody.addEventListener('click', async function(e) {
+                        const target = e.target.closest('button');
+                        if (!target) return;
+
+                        const userId = target.dataset.id;
+                        const row = target.closest('tr');
+
+                        if (target.classList.contains('edit-user-btn')) {
+                            const userData = {
+                                ID_UTILISATEUR: userId,
+                                USERNAME: row.children[0].textContent,
+                                EMAIL: row.children[1].textContent,
+                                ROLE: row.children[2].textContent
+                            };
+                            openUserModal(true, userData);
+                        }
+
+                        if (target.classList.contains('delete-user-btn')) {
+                            if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')) {
+                                const data = {
+                                    id_utilisateur: userId
+                                };
+                                console.log('Suppression utilisateur:', data);
+                                const result = await sendAjaxRequest('/users/delete', 'POST', data);
+                                if (result.success) {
+                                    alert(result.message);
+                                    loadUsers();
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if (userTableBody) {
+                    loadUsers();
+                }
+            }
+
+            // Initialiser les dropdowns et les modals au chargement initial
+            initializeDropdowns();
+            initializeModals();
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('data-url');
+                    if (url) {
+                        loadContent(url);
+                        history.pushState({
+                            path: url
+                        }, '', url);
+                        setActiveSidebarItem(url);
+                    }
+                });
+            });
+
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.path) {
+                    loadContent(event.state.path);
+                    setActiveSidebarItem(event.state.path);
+                } else {
+                    loadContent(window.location.pathname);
+                    setActiveSidebarItem(window.location.pathname);
+                }
+            });
+
+            setActiveSidebarItem(window.location.pathname);
+
+            if (toggleBtn) {
+                const sidebarTexts = document.querySelectorAll('.sidebar-text');
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    if (sidebar.classList.contains('collapsed')) {
+                        mainContent.style.marginLeft = '5rem';
+                        toggleBtn.innerHTML = '<i class="ri-menu-unfold-line ri-lg"></i>';
+                        sidebarTexts.forEach(text => text.style.display = 'none');
+                    } else {
+                        mainContent.style.marginLeft = '0';
+                        toggleBtn.innerHTML = '<i class="ri-menu-fold-line ri-lg"></i>';
+                        sidebarTexts.forEach(text => text.style.display = 'block');
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

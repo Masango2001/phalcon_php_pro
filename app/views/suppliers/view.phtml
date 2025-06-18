@@ -1,0 +1,48 @@
+<main class="flex-1 p-6 bg-gray-50">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Détails du fournisseur : <?= htmlspecialchars($fournisseur->NOM_COMPLET_FOURNISSEUR) ?></h1>
+        <div class="flex space-x-2">
+            <?php if ($canModifySuppliers): ?>
+                <a href="<?= $this->url->get('suppliers/edit/' . $fournisseur->ID_FOURNISSEUR) ?>" class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 flex items-center space-x-2">
+                    <i class="ri-pencil-line"></i>
+                    <span>Modifier le fournisseur</span>
+                </a>
+            <?php endif; ?>
+            <?php if ($canDeleteSuppliers): ?>
+                <a href="<?= $this->url->get('suppliers/delete/' . $fournisseur->ID_FOURNISSEUR) ?>" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 flex items-center space-x-2" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce fournisseur ?');">
+                    <i class="ri-delete-bin-line"></i>
+                    <span>Supprimer</span>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?= $this->flash->output() ?>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm font-medium text-gray-700">Nom Complet :</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($fournisseur->NOM_COMPLET_FOURNISSEUR) ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Email :</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($fournisseur->EMAIL_FOURNISSEUR ?: 'N/A') ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Téléphone :</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($fournisseur->TELEPHONE_FOURNISSEUR ?: 'N/A') ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Adresse :</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($fournisseur->ADRESSE_FOURNISSEUR ?: 'N/A') ?></p>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <a href="<?= $this->url->get('suppliers') ?>" class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</main>

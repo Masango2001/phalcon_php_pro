@@ -1,23 +1,22 @@
-use Phalcon\Mvc\Model;
-
 <?php
 
+namespace GestionStockVente\Models;
+
+use Phalcon\Mvc\Model;
 
 class Fournisseur extends Model
 {
-    public $id_fournisseur;
-    public $nom_complet_fournisseur;
-    public $adresse_fournisseur;
-    public $email_fournisseur;
-    public $telephone_fournisseur;
+    public $ID_FOURNISSEUR;
+    public $NOM_COMPLET_FOURNISSEUR;
+    public $ADRESSE_FOURNISSEUR;
+    public $EMAIL_FOURNISSEUR;
+    public $TELEPHONE_FOURNISSEUR;
 
     public function initialize()
     {
-        $this->setSource('fournisseurs');
-        $this->hasMany(
-            'id_fournisseur',
-            Approvisionnement::class,
-            'id_fournisseur'
-        );
+        $this->setSchema("stocketvente");
+        $this->setSource("FOURNISSEURS");
+
+        $this->hasMany('ID_FOURNISSEUR', 'GestionStockVente\Models\Approvisionnement', 'ID_FOURNISSEUR', ['alias' => 'Approvisionnements']);
     }
 }

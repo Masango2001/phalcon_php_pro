@@ -1,24 +1,22 @@
-use Phalcon\Mvc\Model;
-
 <?php
 
+namespace GestionStockVente\Models;
+
+use Phalcon\Mvc\Model;
 
 class Concerner extends Model
 {
-    public $id_vente;
-    public $id_produit;
-    public $quantite_vendue;
-    public $prix_unitaire_vendue;
+    public $ID_PRODUIT;
+    public $ID_VENTE;
+    public $QUANTITE_VENDUE;
+    public $PRIX_UNITAIRE_VENDUE;
 
     public function initialize()
     {
-        $this->setSource('concerner');
+        $this->setSchema("stocketvente");
+        $this->setSource("CONCERNER");
 
-        $this->belongsTo('id_vente', Vente::class, 'id_vente', [
-            'alias' => 'Vente'
-        ]);
-        $this->belongsTo('id_produit', Produit::class, 'id_produit', [
-            'alias' => 'Produit'
-        ]);
+        $this->belongsTo('ID_PRODUIT', 'GestionStockVente\Models\Produit', 'ID_PRODUIT', ['alias' => 'Produit']);
+        $this->belongsTo('ID_VENTE', 'GestionStockVente\Models\Vente', 'ID_VENTE', ['alias' => 'Vente']);
     }
 }

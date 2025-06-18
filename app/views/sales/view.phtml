@@ -1,0 +1,82 @@
+<main class="flex-1 p-6 bg-gray-50">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Détails de la Vente #<?= htmlspecialchars($vente->ID_VENTE) ?></h1>
+        <?php if ($userRole === 'Admin' || ($userRole === 'Vendeur' && $vente->ID_UTILISATEUR === $currentUserId)): ?>
+            <a href="<?= $this->url->get('sales/edit/' . $vente->ID_VENTE) ?>" class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600 flex items-center space-x-2">
+                <i class="ri-pencil-line"></i>
+                <span>Modifier la vente</span>
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <?= $this->flash->output() ?>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h2 class="text-lg font-semibold mb-3">Informations de la vente</h2>
+                <p class="mb-2"><strong class="text-gray-700">Date de vente :</strong> <?= date('d/m/Y H:i', strtotime($vente->DATE_VENTE)) ?></p>
+                <p class="mb-2"><strong class="text-gray-700">Vendeur :</strong> <?= htmlspecialchars($vente->USER->USERNAME ?? 'Utilisateur inconnu') ?></p>
+                <p class="mb-2"><strong class="text-gray-700">Client :</strong> <?= htmlspecialchars($vente->Client->NOM_CLIENT ?? '') . ' ' . htmlspecialchars($vente->Client->PRENOM_CLIENT ?? '') ?></p>
+                <p class="mb-2"><strong class="text-gray-700">Téléphone :</strong> <?= htmlspecialchars($vente->Client->PHONE ?? 'N/A') ?></p>
+                <p class="mb-2"><strong class="text-gray-700">Adresse :</strong> <?= htmlspecialchars($vente->Client->adresse ?? 'N/A') ?></p>
+                <p class="mb-2"><strong class="text-gray-700">Statut :</strong>
+                    <?php
+                    $statutClass = 'bg-green-100 text-green-800';
+                    if ($saleStatus === 'En attente') {
+                        $statutClass = 'bg-yellow-100 text-yellow-800';
+                    } elseif ($saleStatus === 'Récente') {
+                        $statutClass = 'bg-blue-100 text-blue-800';
+                    }
+                    ?>
+                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <?= $statutClass ?>">
+                        <?= htmlspecialchars($saleStatus) ?>
+                    </span>
+                </p>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold mb-3">Résumé de la commande</h2>
+                <p class="mb-2"><strong class="text-gray-700">Montant total :</strong> <span class="text-xl font-bold"><?= number_format($totalAmount, 2) ?> €</span></p>
+            </div>
+        </div>
+
+        <h2 class="text-lg font-semibold mt-6 mb-3">Produits vendus</h2>
+        <?php if (!empty($concerners)): ?>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="px-4 py-2 border-b">Produit</th>
+                            <th class="px-4 py-2 border-b text-center">Quantité</th>
+                            <th class="px-4 py-2 border-b text-right">Prix unitaire</th>
+                            <th class="px-4 py-2 border-b text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($concerners as $concerner): ?>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2 text-sm text-gray-900"><?= htmlspecialchars($concerner->p->NOM_PRODUIT ?? 'Produit inconnu') ?></td>
+                                <td class="px-4 py-2 text-sm text-gray-500 text-center"><?= htmlspecialchars($concerner->QUANTITE_VENDUE) ?></td>
+                                <td class="px-4 py-2 text-sm text-gray-500 text-right"><?= number_format($concerner->PRIX_UNITAIRE_VENDUE, 2) ?> €</td>
+                                <td class="px-4 py-2 text-sm text-gray-500 text-right"><?= number_format($concerner->QUANTITE_VENDUE * $concerner->PRIX_UNITAIRE_VENDUE, 2) ?> €</td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p class="text-gray-500">Aucun produit associé à cette vente.</p>
+        <?php endif; ?>
+
+        <div class="mt-6 flex justify-end gap-3">
+            <a href="<?= $this->url->get('sales') ?>" class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Retour à la liste
+            </a>
+            <?php if ($userRole === 'Admin' || ($userRole === 'Vendeur' && $vente->ID_UTILISATEUR === $currentUserId)): ?>
+                <a href="<?= $this->url->get('sales/edit/' . $vente->ID_VENTE) ?>" class="inline-flex justify-center py-2 px-4 bg-yellow-500 text-white rounded-md shadow-sm text-sm font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                    Modifier la vente
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</main>

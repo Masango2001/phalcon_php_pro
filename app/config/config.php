@@ -1,21 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+use Phalcon\Config\Config;
+
 /*
- * Modified: prepend directory path of current file, because of this file own different ENV under between Apache and command line.
- * NOTE: please remove this comment.
+ * Définition des chemins de base pour l'application.
+ * Assure que APP_PATH et BASE_PATH sont correctement définis, peu importe l'environnement (web ou CLI).
  */
+
 defined('BASE_PATH') || define('BASE_PATH', getenv('BASE_PATH') ?: realpath(dirname(__FILE__) . '/../..'));
 defined('APP_PATH') || define('APP_PATH', BASE_PATH . '/app');
 
-return new \Phalcon\Config\Config([
-    'database' => [
-        'adapter'     => 'Mysql',
-        'host'        => 'localhost',
-        'username'    => 'root',
-        'password'    => '',
-        'dbname'      => 'test',
-        'charset'     => 'utf8',
-    ],
+return new Config([
     'application' => [
         'appDir'         => APP_PATH . '/',
         'controllersDir' => APP_PATH . '/controllers/',
@@ -26,5 +23,25 @@ return new \Phalcon\Config\Config([
         'libraryDir'     => APP_PATH . '/library/',
         'cacheDir'       => BASE_PATH . '/cache/',
         'baseUri'        => '/',
-    ]
+
+    ],
+    'database' => [
+        'adapter'  => 'Mysql',
+        'host'     => 'localhost',
+        'username' => 'root',
+        'password' => '',
+        'dbname'   => 'stocketvente',
+        'charset'  => 'utf8mb4',
+    ],
+    'debug' => [
+        'enabled' => true,
+    ],
+    'phalcon' => [
+        'session' => [
+            'adapter' => 'files',
+            'options' => [
+                'uniqueId' => 'gestionstockvente_session'
+            ]
+        ]
+    ],
 ]);

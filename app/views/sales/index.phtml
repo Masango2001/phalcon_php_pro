@@ -1,0 +1,447 @@
+<div class="p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded shadow p-6 card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-gray-500">Ventes aujourd'hui</h3>
+                <div class="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full text-primary">
+                    <i class="ri-shopping-cart-line ri-lg"></i>
+                </div>
+            </div>
+            <div class="flex items-end justify-between">
+                <div>
+                    <p class="text-2xl font-bold"><?= $salesTodayCount ?></p>
+                    <?php if ($salesTodayChange !== 0): ?>
+                        <p class="text-xs <?= $salesTodayChange >= 0 ? 'text-green-500' : 'text-red-500' ?> flex items-center mt-1">
+                            <i class="ri-arrow-<?= $salesTodayChange >= 0 ? 'up' : 'down' ?>-line mr-1"></i>
+                            <?= abs($salesTodayChange) ?>% depuis hier
+                        </p>
+                    <?php else: ?>
+                        <p class="text-xs text-gray-500 flex items-center mt-1">
+                            Pas de changement significatif
+                        </p>
+                    <?php endif; ?>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-semibold"><?= $salesTodayTotal ?> €</p>
+                    <p class="text-xs text-gray-500 mt-1">Total</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded shadow p-6 card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-gray-500">Ventes du mois</h3>
+                <div class="w-10 h-10 flex items-center justify-center bg-green-100 rounded-full text-green-600">
+                    <i class="ri-calendar-line ri-lg"></i>
+                </div>
+            </div>
+            <div class="flex items-end justify-between">
+                <div>
+                    <p class="text-2xl font-bold"><?= $salesMonthCount ?></p>
+                    <?php if ($salesMonthChange !== 0): ?>
+                        <p class="text-xs <?= $salesMonthChange >= 0 ? 'text-green-500' : 'text-red-500' ?> flex items-center mt-1">
+                            <i class="ri-arrow-<?= $salesMonthChange >= 0 ? 'up' : 'down' ?>-line mr-1"></i>
+                            <?= abs($salesMonthChange) ?>% depuis mois dernier
+                        </p>
+                    <?php else: ?>
+                        <p class="text-xs text-gray-500 flex items-center mt-1">
+                            Pas de changement significatif
+                        </p>
+                    <?php endif; ?>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-semibold"><?= $salesMonthTotal ?> €</p>
+                    <p class="text-xs text-gray-500 mt-1">Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded shadow p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div class="flex-1">
+                <div class="relative">
+                    <input type="text" placeholder="Rechercher une vente..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <i class="ri-search-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded shadow p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold">Évolution des ventes</h3>
+                <div class="relative">
+                    <button id="chart-period-btn" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-button !rounded-button text-gray-700 text-sm flex items-center whitespace-nowrap">
+                        <span>Ce mois</span>
+                        <i class="ri-arrow-down-s-line ml-1"></i>
+                    </button>
+                    <div id="chart-period-dropdown" class="ventes-dropdown-content right-0 mt-1 w-40">
+                        <a href="#">Cette semaine</a>
+                        <a href="#">Ce mois</a>
+                        <a href="#">Ce trimestre</a>
+                        <a href="#">Cette année</a>
+                    </div>
+                </div>
+            </div>
+            <div id="sales-chart" class="w-full h-64"></div>
+        </div>
+        <div class="bg-white rounded shadow p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold">Répartition des ventes</h3>
+                <div class="relative">
+                    <button id="chart-type-btn" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-button !rounded-button text-gray-700 text-sm flex items-center whitespace-nowrap">
+                        <span>Par catégorie</span>
+                        <i class="ri-arrow-down-s-line ml-1"></i>
+                    </button>
+                    <div id="chart-type-dropdown" class="ventes-dropdown-content right-0 mt-1 w-40">
+                        <a href="#">Par catégorie</a>
+                        <a href="#">Par produit</a>
+                        <a href="#">Par client</a>
+                    </div>
+                </div>
+            </div>
+            <div id="distribution-chart" class="w-full h-64"></div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded shadow mb-6 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="custom-checkbox mr-3">
+                                Référence
+                            </div>
+                        </th>
+                        <th class="px-6 py-3">Date</th>
+                        <th class="px-6 py-3">Client</th>
+                        <th class="px-6 py-3">Produits</th>
+                        <th class="px-6 py-3">Montant</th>
+                        <th class="px-6 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <?php if (empty($sales)): ?>
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">Aucune vente trouvée.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($sales as $sale): ?>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="custom-checkbox mr-3">
+                                        <span class="text-sm font-medium"><?= $sale['reference']; ?></span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm"><?= date('d F Y', strtotime($sale['date'])); ?></span>
+                                        <span class="text-xs text-gray-500"><?= date('H:i', strtotime($sale['date'])); ?></span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mr-3">
+                                            <span class="text-xs font-medium"><?= strtoupper(substr($sale['client']['name'], 0, 1) . (strpos($sale['client']['name'], ' ') !== false ? substr($sale['client']['name'], strpos($sale['client']['name'], ' ') + 1, 1) : '')); ?></span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium"><?= $sale['client']['name']; ?></p>
+                                            <p class="text-xs text-gray-500"><?= $sale['client']['contact']; ?></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex -space-x-2 mr-2">
+                                            <?php foreach ($sale['products'] as $index => $product): ?>
+                                                <?php if ($index < 2): ?>
+                                                    <div class="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs text-gray-700 font-medium">
+                                                        <?= substr($product['name'], 0, 1) ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                            <?php if (count($sale['products']) > 2): ?>
+                                                <div class="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
+                                                    +<?= count($sale['products']) - 2; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <span class="text-sm"><?= count($sale['products']); ?> produits</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm font-medium"><?= number_format($sale['total'], 2); ?> €</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex space-x-2">
+                                        <a href="<?= $this->url->get('sales/view/' . $sale['id']) ?>" class="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-gray-100" title="Voir les détails">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary bg-gray-100 rounded-full" title="Générer facture">
+                                            <i class="ri-file-list-line"></i>
+                                        </button>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary bg-gray-100 rounded-full" title="Plus d'options">
+                                            <i class="ri-more-2-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="px-6 py-4 flex items-center justify-between border-t">
+            <div>
+                <p class="text-sm text-gray-700">
+                    Affichage de <span class="font-medium">1</span> à <span class="font-medium"><?= count($sales); ?></span> sur <span class="font-medium"><?= count($sales); ?></span> résultats
+                </p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button class="px-3 py-1 bg-gray-100 text-gray-500 rounded-button !rounded-button text-sm flex items-center whitespace-nowrap">
+                    <i class="ri-arrow-left-s-line mr-1"></i>
+                    Précédent
+                </button>
+                <div class="flex">
+                    <button class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded">1</button>
+                </div>
+                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-button !rounded-button text-sm flex items-center whitespace-nowrap">
+                    Suivant
+                    <i class="ri-arrow-right-s-line ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded shadow">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold">Ventes récentes</h3>
+                    <a href="#" class="text-primary text-sm font-medium hover:underline">Voir tout</a>
+                </div>
+            </div>
+            <div class="p-6">
+                <ul class="divide-y divide-gray-200">
+                    <?php if (empty($recentSales)): ?>
+                        <li class="py-3 text-center text-gray-500">Aucune vente récente.</li>
+                    <?php else: ?>
+                        <?php foreach ($recentSales as $sale): ?>
+                            <li class="py-3 first:pt-0">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mr-3">
+                                        <span class="text-xs font-medium"><?= strtoupper(substr($sale['client']['name'], 0, 1) . (strpos($sale['client']['name'], ' ') !== false ? substr($sale['client']['name'], strpos($sale['client']['name'], ' ') + 1, 1) : '')); ?></span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-sm font-medium"><?= $sale['client']['name']; ?></p>
+                                            <p class="text-sm font-medium"><?= number_format($sale['total'], 2); ?> €</p>
+                                        </div>
+                                        <div class="flex items-center justify-between mt-1">
+                                            <p class="text-xs text-gray-500"><?= $sale['client']['contact']; ?></p>
+                                            <p class="text-xs text-gray-500"><?= $sale['timeAgo']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-white rounded shadow">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold">Meilleurs clients</h3>
+                    <a href="#" class="text-primary text-sm font-medium hover:underline">Voir tout</a>
+                </div>
+            </div>
+            <div class="p-6">
+                <ul class="divide-y divide-gray-200">
+                    <?php if (empty($bestCustomers)): ?>
+                        <li class="py-3 text-center text-gray-500">Aucun meilleur client trouvé.</li>
+                    <?php else: ?>
+                        <?php foreach ($bestCustomers as $customer): ?>
+                            <li class="py-3 first:pt-0">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mr-3">
+                                        <span class="text-xs font-medium"><?= strtoupper(substr($customer['name'], 0, 1) . (strpos($customer['name'], ' ') !== false ? substr($customer['name'], strpos($customer['name'], ' ') + 1, 1) : '')); ?></span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-sm font-medium"><?= $customer['name']; ?></p>
+                                            <p class="text-sm font-medium"><?= number_format($customer['totalSpent'], 2); ?> €</p>
+                                        </div>
+                                        <div class="flex items-center justify-between mt-1">
+                                            <p class="text-xs text-gray-500"><?= $customer['contact']; ?></p>
+                                            <p class="text-xs text-gray-500"><?= $customer['purchaseCount']; ?> achats</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sales Trend Chart
+        const salesTrendCtx = document.getElementById('sales-chart').getContext('2d');
+        const salesTrendData = <?= $salesTrendData ?>;
+        const salesTrendLabels = <?= $salesTrendLabels ?>;
+
+        new Chart(salesTrendCtx, {
+            type: 'line',
+            data: {
+                labels: salesTrendLabels,
+                datasets: [{
+                    label: 'Montant des ventes',
+                    data: salesTrendData,
+                    borderColor: '#4A90E2',
+                    backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Montant (€)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Période'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Sales Distribution Chart
+        const salesDistributionCtx = document.getElementById('distribution-chart').getContext('2d');
+        const salesDistributionData = <?= $salesDistributionData ?>;
+        const salesDistributionLabels = <?= $salesDistributionLabels ?>;
+
+        new Chart(salesDistributionCtx, {
+            type: 'pie', // Or 'doughnut'
+            data: {
+                labels: salesDistributionLabels,
+                datasets: [{
+                    label: 'Répartition des ventes',
+                    data: salesDistributionData,
+                    backgroundColor: [
+                        '#4A90E2', '#50E3C2', '#F5A623', '#BD10E0', '#9013FE', '#7ED321', '#FF4E50', '#00BCD4'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += new Intl.NumberFormat('fr-FR', {
+                                        style: 'currency',
+                                        currency: 'EUR'
+                                    }).format(context.parsed);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Dropdown functionality (Purely visual, no data filtering logic)
+        document.querySelectorAll('[id$="-btn"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const dropdown = document.getElementById(this.id.replace('-btn', '-dropdown'));
+                dropdown.classList.toggle('active');
+            });
+        });
+
+        document.querySelectorAll('.ventes-dropdown-content a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const button = this.closest('.relative').querySelector('[id$="-btn"] span');
+                button.textContent = this.textContent;
+                this.closest('.ventes-dropdown-content').classList.remove('active');
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.ventes-dropdown-content').forEach(dropdown => {
+                const button = dropdown.closest('.relative').querySelector('[id$="-btn"]');
+                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .ventes-dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 0.25rem;
+        padding: 0.5rem 0;
+    }
+
+    .ventes-dropdown-content a {
+        color: black;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        display: block;
+    }
+
+    .ventes-dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .ventes-dropdown-content.active {
+        display: block;
+    }
+</style>

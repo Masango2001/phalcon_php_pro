@@ -1,0 +1,54 @@
+<main class="flex-1 p-6 bg-gray-50">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Détails de l'entrée de Stock pour : <?= htmlspecialchars($stockDetails['NOM_PRODUIT']) ?></h1>
+        <?php if ($canModifyStocks): ?>
+            <a href="<?= $this->url->get('stocks/edit/' . $stockDetails['ID_STOCK']) ?>" class="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 flex items-center space-x-2">
+                <i class="ri-pencil-line"></i>
+                <span>Modifier le Stock</span>
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <?= $this->flash->output() ?>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm font-medium text-gray-700">ID Stock:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($stockDetails['ID_STOCK']) ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Produit concerné:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($stockDetails['NOM_PRODUIT']) ?></p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Quantité en Stock:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($stockDetails['QUANTITE_STOCK']) ?> unités</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Statut du Stock:</p>
+                <?php
+                $statutClass = 'bg-green-100 text-green-800';
+                if ($stockDetails['STATUT_STOCK'] === 'Faible Stock') {
+                    $statutClass = 'bg-yellow-100 text-yellow-800';
+                } elseif ($stockDetails['STATUT_STOCK'] === 'Rupture de Stock') {
+                    $statutClass = 'bg-red-100 text-red-800';
+                }
+                ?>
+                <span class="mt-1 px-3 py-1 inline-flex text-base leading-5 font-semibold rounded-full <?= $statutClass ?>">
+                    <?= htmlspecialchars($stockDetails['STATUT_STOCK']) ?>
+                </span>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-700">Date de dernière mise à jour:</p>
+                <p class="mt-1 text-lg text-gray-900"><?= htmlspecialchars($stockDetails['DATE_MISEJOUR']) ?></p>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <a href="<?= $this->url->get('stocks') ?>" class="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</main>

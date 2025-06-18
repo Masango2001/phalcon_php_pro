@@ -1,0 +1,140 @@
+<div id="sidebar" class="sidebar bg-white shadow-lg w-64 h-full flex flex-col z-10">
+    <div class="p-4 flex items-center justify-between border-b">
+        <h1 class="text-xl font-['Pacifico'] text-primary">
+            <?php echo $this->tag->linkTo(['/', 'Gestion Stock & Vente', 'class' => 'no-underline text-primary']); ?>
+        </h1>
+        <button id="toggle-sidebar" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary">
+            <i class="ri-menu-fold-line ri-lg"></i>
+        </button>
+    </div>
+    <div class="flex-1 overflow-y-auto py-4">
+        <div class="px-4 mb-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 flex items-center justify-center bg-primary rounded-full text-white">
+                    <i class="ri-user-line ri-lg"></i>
+                </div>
+                <div class="sidebar-text">
+                    <p class="text-sm font-medium">Bienvenue,</p>
+                    <p class="text-sm font-semibold"><?php echo $this->session->get('auth')['username'] ?? 'Utilisateur'; ?></p>
+                </div>
+            </div>
+        </div>
+        <ul class="space-y-1">
+            <?php
+            $role = strtolower($this->session->get('auth')['role'] ?? 'guest');
+            $allowedRoutes = [
+                'admin' => ['/dashboard', '/products', '/stocks', '/sales', '/clients', '/suppliers', '/reports', '/users'],
+                'vendeur' => ['/dashboard', '/sales', '/clients', '/products'],
+                'magasinier' => ['/dashboard', '/stocks', '/suppliers'],
+            ];
+            $routes = $allowedRoutes[$role] ?? [];
+            $routeNames = [
+                '/products' => 'Produits',
+                '/stocks' => 'Stocke',
+                '/sales' => 'Ventes',
+                '/clients' => 'Clients',
+                '/suppliers' => 'Fournisseurs',
+                '/reports' => 'Rapports',
+                '/users' => 'users',
+                '/dashboard' => 'Tableau de bord',
+            ];
+            ?>
+
+            <?php if (in_array('/dashboard', $routes)): ?>
+                <li>
+                    <a href="/dashboard" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'dashboard' ? 'bg-gray-100' : ''; ?>" data-url="/dashboard">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-dashboard-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Tableau de bord</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/products', $routes) && in_array($role, ['admin', 'vendeur'])): ?>
+                <li>
+                    <a href="/products" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'products' ? 'bg-gray-100' : ''; ?>" data-url="/products">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-store-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Produits</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/stocks', $routes) && in_array($role, ['admin', 'magasinier'])): ?>
+                <li>
+                    <a href="/stocks" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'stocks' ? 'bg-gray-100' : ''; ?>" data-url="/stocks">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-store-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Stocke</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/sales', $routes)): ?>
+                <li>
+                    <a href="/sales" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'sales' ? 'bg-gray-100' : ''; ?>" data-url="/sales">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-shopping-cart-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Ventes</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/clients', $routes)): ?>
+                <li>
+                    <a href="/clients" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'clients' ? 'bg-gray-100' : ''; ?>" data-url="/clients">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-user-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Clients</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/suppliers', $routes)): ?>
+                <li>
+                    <a href="/suppliers" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'suppliers' ? 'bg-gray-100' : ''; ?>" data-url="/suppliers">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-truck-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Fournisseurs</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/reports', $routes)): ?>
+                <li>
+                    <a href="/reports" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'reports' ? 'bg-gray-100' : ''; ?>" data-url="/reports">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-file-list-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Rapports</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php if (in_array('/users', $routes)): ?>
+                <li>
+                    <a href="/settings" class="sidebar-item sidebar-link flex items-center px-4 py-3 text-gray-700 <?php echo $this->router->getMatchedRoute()?->getName() === 'users' ? 'bg-gray-100' : ''; ?>" data-url="/users">
+                        <div class="w-8 h-8 flex items-center justify-center mr-3">
+                            <i class="ri-settings-line ri-lg"></i>
+                        </div>
+                        <span class="sidebar-text">Utilisateurs </span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </div>
+    <div class="p-4 border-t">
+        <a href="/logout" class="sidebar-item flex items-center px-4 py-2 text-gray-700 rounded-button hover:bg-gray-100">
+            <div class="w-8 h-8 flex items-center justify-center mr-3">
+                <i class="ri-logout-box-line ri-lg"></i>
+            </div>
+            <span class="sidebar-text">Déconnexion</span>
+        </a>
+    </div>
+</div>
