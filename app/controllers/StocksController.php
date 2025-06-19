@@ -40,7 +40,6 @@ class StocksController extends ControllerBase
                 $canDeleteStocks = true;
                 break;
             case 'vendeur':
-
                 $canViewStocksList = true;
                 $canAddStocks = false;
                 $canModifyStocks = false;
@@ -54,7 +53,6 @@ class StocksController extends ControllerBase
         $stocksData = [];
         try {
             if ($canViewStocksList) {
-
                 $stocksResultSet = $this->modelsManager->createQuery(
                     "SELECT s.ID_STOCK, s.QUANTITE_STOCK, s.DATE_MISEJOUR, p.NOM_PRODUIT, p.ID_PRODUIT
                      FROM GestionStockVente\\Models\\Stock s
@@ -69,8 +67,8 @@ class StocksController extends ControllerBase
                             'ID_PRODUIT'       => $row->ID_PRODUIT,
                             'NOM_PRODUIT'      => $row->NOM_PRODUIT,
                             'QUANTITE_STOCK'   => $row->QUANTITE_STOCK,
-                            'DATE_MISEJOUR'    => (new \DateTime($row->DATE_MISEJOUR))->format('d/m/Y H:i:s'), // Formater la date
-                            'STATUT_STOCK'     => $this->getStockStatus($row->QUANTITE_STOCK), // Fonction utilitaire pour le statut
+                            'DATE_MISEJOUR'    => (new \DateTime($row->DATE_MISEJOUR))->format('d/m/Y H:i:s'),
+                            'STATUT_STOCK'     => $this->getStockStatus((int)$row->QUANTITE_STOCK), // Conversion en int
                         ];
                     }
                 }
@@ -93,7 +91,6 @@ class StocksController extends ControllerBase
         $this->view->pick('stocks/index');
     }
 
-    // Helper function pour déterminer le statut du stock
     private function getStockStatus(int $quantity): string
     {
         if ($quantity <= 5 && $quantity > 0) {
@@ -123,15 +120,13 @@ class StocksController extends ControllerBase
                 return $this->response->redirect('stocks/create');
             }
 
-            // Vérifier si un stock existe déjà pour ce produit
             $existingStock = Stock::findFirst([
                 'conditions' => 'ID_PRODUIT = :id_produit:',
                 'bind' => ['id_produit' => $idProduit]
             ]);
 
             if ($existingStock) {
-                // Si un stock existe, mettez à jour la quantité
-                $existingStock->QUANTITE_STOCK += $quantiteStock; // Ajoute à la quantité existante
+                $existingStock->QUANTITE_STOCK += $quantiteStock;
                 $existingStock->DATE_MISEJOUR = date('Y-m-d H:i:s');
 
                 if (!$existingStock->save()) {
@@ -142,7 +137,6 @@ class StocksController extends ControllerBase
                 }
                 $this->flash->success("Le stock pour le produit a été mis à jour avec succès (nouvelle quantité: " . $existingStock->QUANTITE_STOCK . ").");
             } else {
-                // Sinon, créez une nouvelle entrée de stock
                 $stock->ID_PRODUIT = $idProduit;
                 $stock->QUANTITE_STOCK = $quantiteStock;
                 $stock->DATE_MISEJOUR = date('Y-m-d H:i:s');
@@ -158,7 +152,6 @@ class StocksController extends ControllerBase
             return $this->response->redirect('stocks');
         }
 
-        // Pour l'affichage du formulaire : récupérer tous les produits disponibles
         $products = Produit::find();
         $this->view->setVar('products', $products);
         $this->view->pick('stocks/create');
@@ -180,7 +173,6 @@ class StocksController extends ControllerBase
 
         if ($this->request->isPost()) {
             $quantiteStock = $this->request->getPost('quantite_stock', 'int');
-            // La date de mise à jour peut être automatique ou modifiable
             $dateMiseJour = $this->request->getPost('date_misejour', 'string');
 
             if ($quantiteStock < 0) {
@@ -189,7 +181,6 @@ class StocksController extends ControllerBase
             }
 
             $stock->QUANTITE_STOCK = $quantiteStock;
-            // Si vous voulez permettre la modification de la date, sinon laissez-la automatique
             $stock->DATE_MISEJOUR = !empty($dateMiseJour) ? $dateMiseJour : date('Y-m-d H:i:s');
 
             if (!$stock->save()) {
@@ -203,10 +194,8 @@ class StocksController extends ControllerBase
             return $this->response->redirect('stocks');
         }
 
-        // Pour l'affichage du formulaire d'édition
         $this->view->setVar('stock', $stock);
-        // On peut aussi passer le produit associé pour afficher son nom
-        $this->view->setVar('product', $stock->getProduit()); // Utilise l'alias 'Produit' défini dans le modèle Stock
+        $this->view->setVar('product', $stock->getProduit());
         $this->view->pick('stocks/edit');
     }
 
@@ -237,7 +226,7 @@ class StocksController extends ControllerBase
     public function viewAction($id)
     {
         $role = $this->session->get('auth')['role'] ?? 'guest';
-        if ($role === 'guest') { // Ou si la permission spécifique n'est pas accordée
+        if ($role === 'guest') {
             $this->flash->error("Vous n'avez pas la permission de voir les détails d'un stock.");
             return $this->response->redirect('stocks');
         }
@@ -248,15 +237,14 @@ class StocksController extends ControllerBase
             return $this->response->redirect('stocks');
         }
 
-        // Charger le produit associé pour afficher son nom
-        $product = $stock->getProduit(); // Utilise l'alias 'Produit' défini dans le modèle Stock
+        $product = $stock->getProduit();
 
         $stockDetails = [
             'ID_STOCK'         => $stock->ID_STOCK,
             'NOM_PRODUIT'      => $product ? htmlspecialchars($product->NOM_PRODUIT) : 'Produit inconnu',
             'QUANTITE_STOCK'   => $stock->QUANTITE_STOCK,
             'DATE_MISEJOUR'    => (new \DateTime($stock->DATE_MISEJOUR))->format('d/m/Y H:i:s'),
-            'STATUT_STOCK'     => $this->getStockStatus($stock->QUANTITE_STOCK),
+            'STATUT_STOCK'     => $this->getStockStatus((int)$stock->QUANTITE_STOCK), // Conversion en int ici aussi
         ];
 
         $this->view->setVar('stockDetails', $stockDetails);

@@ -98,14 +98,24 @@ class UsersController extends ControllerBase
                 ])->setStatusCode(400, 'Bad Request');
             }
 
-            if (Utilisateur::findFirstByEmail($email)) {
+            // Remplacer findFirstByEmail
+            $existingUser = Utilisateur::findFirst([
+                'conditions' => 'EMAIL = :email:',
+                'bind' => ['email' => $email]
+            ]);
+            if ($existingUser) {
                 return $response->setJsonContent([
                     'success' => false,
                     'message' => 'Un utilisateur avec cet email existe déjà.'
                 ])->setStatusCode(409, 'Conflict');
             }
 
-            if (Utilisateur::findFirstByUsername($username)) {
+            // Remplacer findFirstByUsername
+            $existingUser = Utilisateur::findFirst([
+                'conditions' => 'USERNAME = :username:',
+                'bind' => ['username' => $username]
+            ]);
+            if ($existingUser) {
                 return $response->setJsonContent([
                     'success' => false,
                     'message' => 'Un utilisateur avec ce nom d\'utilisateur existe déjà.'
@@ -200,18 +210,32 @@ class UsersController extends ControllerBase
                 ])->setStatusCode(400, 'Bad Request');
             }
 
-            if ($email !== $user->EMAIL && Utilisateur::findFirstByEmail($email)) {
-                return $response->setJsonContent([
-                    'success' => false,
-                    'message' => 'Cet email est déjà utilisé.'
-                ])->setStatusCode(409, 'Conflict');
+            // Remplacer findFirstByEmail
+            if ($email !== $user->EMAIL) {
+                $existingUser = Utilisateur::findFirst([
+                    'conditions' => 'EMAIL = :email:',
+                    'bind' => ['email' => $email]
+                ]);
+                if ($existingUser) {
+                    return $response->setJsonContent([
+                        'success' => false,
+                        'message' => 'Cet email est déjà utilisé.'
+                    ])->setStatusCode(409, 'Conflict');
+                }
             }
 
-            if ($username !== $user->USERNAME && Utilisateur::findFirstByUsername($username)) {
-                return $response->setJsonContent([
-                    'success' => false,
-                    'message' => 'Ce nom d\'utilisateur est déjà pris.'
-                ])->setStatusCode(409, 'Conflict');
+            // Remplacer findFirstByUsername
+            if ($username !== $user->USERNAME) {
+                $existingUser = Utilisateur::findFirst([
+                    'conditions' => 'USERNAME = :username:',
+                    'bind' => ['username' => $username]
+                ]);
+                if ($existingUser) {
+                    return $response->setJsonContent([
+                        'success' => false,
+                        'message' => 'Ce nom d\'utilisateur est déjà pris.'
+                    ])->setStatusCode(409, 'Conflict');
+                }
             }
 
             $user->USERNAME = $username;
